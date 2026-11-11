@@ -14,8 +14,13 @@ class MessagingService {
   /// 3. final token = await _messaging.getToken()
   /// 4. await _messaging.subscribeToTopic(topic), then return token
   Future<String?> init() async {
-    // TODO(6)
-    return null;
+    final settings = await _messaging.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.denied) {
+      return null;
+    }
+    final token = await _messaging.getToken();
+    await _messaging.subscribeToTopic(topic);
+    return token;
   }
 
   /// Calls [show] for every message that arrives while the app is open.
@@ -23,9 +28,10 @@ class MessagingService {
   /// Listen to FirebaseMessaging.onMessage; use message.notification?.title / ?.body
   /// ('New message' and '' if they are null).
   void listenInForeground(void Function(String title, String body) show) {
-    // TODO(6)
+    FirebaseMessaging.onMessage.listen((message) {
+      final title = message.notification?.title ?? 'New message';
+      final body = message.notification?.body ?? '';
+      show(title, body);
+    });
   }
 }
-
-// Remove this line when you are done:
-// ignore_for_file: unused_field

@@ -8,6 +8,12 @@ service cloud.firestore {
     //   with 1 to 100 characters.
     // Everything else stays closed (no rule = denied).
 
-    // TODO(5)
+    match /users/{uid}/notes/{noteId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 100;
+    }
   }
 }
